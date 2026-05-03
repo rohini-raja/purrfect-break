@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Purrfect Break</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 300px;
+      min-height: 100px;
+      background: #060e07;
+      color: #eaf5ec;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    /* Ambient mesh glow */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% -10%, rgba(61,122,74,0.22) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 35% at 85% 105%, rgba(45,100,58,0.18) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .cat-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, rgba(61,122,74,0.35), rgba(116,184,135,0.12));
+      border: 1px solid rgba(116,184,135,0.22);
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px;
+      animation: float 3s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+    .title { font-size: 15px; font-weight: 700; color: #eaf5ec; letter-spacing: -0.4px; }
+    .subtitle { font-size: 10px; color: rgba(168,212,176,0.38); font-weight: 500; letter-spacing: 0.6px; text-transform: uppercase; margin-top: 2px; }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34,197,94,0.7);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+    /* ── Mood card ── */
+    .mood-card {
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .mood-emoji { font-size: 42px; line-height: 1; flex-shrink: 0; }
+    .mood-right { flex: 1; min-width: 0; }
+    .mood-top {
+      display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 8px;
+    }
+    .mood-state { font-size: 15px; font-weight: 700; color: #eaf5ec; letter-spacing: -0.3px; }
+    .mood-pct { font-size: 11px; color: rgba(168,212,176,0.4); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .mood-bar {
+      height: 4px; border-radius: 99px;
+      background: rgba(255,255,255,0.07);
+      overflow: hidden; margin-bottom: 6px;
+    }
+    .mood-fill { height: 100%; border-radius: 99px; transition: width 0.7s ease, background 0.7s ease; }
+    .mood-sub { font-size: 10px; color: rgba(168,212,176,0.32); font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; }
+
+    /* ── Stats row ── */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .stat {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 11px;
+      padding: 10px 4px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .stat:hover { border-color: rgba(116,184,135,0.2); }
+    .stat-val { font-size: 20px; font-weight: 700; color: #74b887; letter-spacing: -0.5px; }
+    .stat-lbl { font-size: 9px; color: rgba(168,212,176,0.32); font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 3px; }
+
+    /* ── Next break ── */
+    .next-break {
+      background: rgba(61,122,74,0.08);
+      border: 1px solid rgba(61,122,74,0.18);
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-size: 12px;
+      color: rgba(168,212,176,0.65);
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+    .next-break span { color: #74b887; font-weight: 700; }
+
+    /* ── Section card ── */
+    .section {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.065);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .section-label {
+      font-size: 9px; font-weight: 600;
+      color: rgba(168,212,176,0.32);
+      text-transform: uppercase; letter-spacing: 1.2px;
+      margin-bottom: 10px;
+    }
+
+    /* ── Cat roster 3-column ── */
+    .cat-roster { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+    .cat-slot {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      padding: 10px 6px; border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: default; transition: all 0.2s;
+      text-align: center;
+    }
+    .cat-slot.active {
+      background: rgba(61,122,74,0.2);
+      border-color: rgba(116,184,135,0.38);
+      box-shadow: 0 0 18px rgba(61,122,74,0.14);
+    }
+    .cat-slot.unlocked {
+      background: rgba(255,255,255,0.03);
+      border-color: rgba(255,255,255,0.07);
+    }
+    .cat-slot.locked { opacity: 0.3; border-color: rgba(255,255,255,0.04); }
+    .cat-slot-emoji { font-size: 22px; line-height: 1; }
+    .cat-slot-name { font-size: 10px; font-weight: 700; color: #a8d4b0; letter-spacing: -0.1px; }
+    .cat-slot-tag { font-size: 9px; color: rgba(168,212,176,0.38); font-weight: 500; }
+    .cat-slot.active .cat-slot-tag { color: #74b887; font-weight: 600; }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      width: 100%; padding: 12px;
+      background: linear-gradient(135deg, #3d7a4a 0%, #5ca86a 100%);
+      border: none; border-radius: 12px;
+      color: #fff; font-family: inherit;
+      font-size: 13px; font-weight: 600; letter-spacing: -0.2px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(61,122,74,0.38), inset 0 1px 0 rgba(255,255,255,0.15);
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(61,122,74,0.55), inset 0 1px 0 rgba(255,255,255,0.15); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-row { display: flex; gap: 6px; }
+    .btn-secondary {
+      flex: 1; padding: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      color: rgba(168,212,176,0.55); font-family: inherit;
+      font-size: 12px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.08); color: #eaf5ec; border-color: rgba(255,255,255,0.14); }
+
+    .footer {
+      text-align: center; padding-top: 2px;
+      font-size: 10px; color: rgba(168,212,176,0.18); font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <div class="cat-icon">🐱</div>
+        <div>
+          <div class="title">Purrfect Break</div>
+          <div class="subtitle">Wellness Companion</div>
+        </div>
+      </div>
+      <div class="live-dot"></div>
+    </div>
+
+    <!-- Mood -->
+    <div class="mood-card">
+      <div class="mood-emoji" id="mood-emoji">😺</div>
+      <div class="mood-right">
+        <div class="mood-top">
+          <span class="mood-state" id="happiness-label">Content</span>
+          <span class="mood-pct" id="happiness-pct">50%</span>
+        </div>
+        <div class="mood-bar">
+          <div class="mood-fill" id="happiness-fill" style="width:50%"></div>
+        </div>
+        <div class="mood-sub">Cat happiness</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val" id="streak-val">0</div>
+        <div class="stat-lbl">🔥 Streak</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="best-val">0</div>
+        <div class="stat-lbl">⭐ Best</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="done-val">0</div>
+        <div class="stat-lbl">✅ Done</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">15</div>
+        <div class="stat-lbl">⏱ Min</div>
+      </div>
+    </div>
+
+    <!-- Next break -->
+    <div class="next-break" id="next-break-text">Calculating next visit… 🐾</div>
+
+    <!-- Cat roster -->
+    <div class="section">
+      <div class="section-label">🐱 Your Cats</div>
+      <div class="cat-roster" id="cat-roster"></div>
+    </div>
+
+    <!-- Buttons -->
+    <button class="btn-primary" id="test-btn">🐾 &nbsp;Summon the Cat Now</button>
+    <button class="btn-secondary" id="reset-btn" style="width:100%">↺ Reset Timer</button>
+
+    <div class="footer">Visits every 15 minutes ♥</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
