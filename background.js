@@ -616,9 +616,9 @@ const CAT_CSS = `
   @keyframes pb-gift-wobble { 0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)} }
 
   /* ── Breathing circle ── */
-  .pb-breathe { display:flex;flex-direction:column;align-items:center;margin:8px 0 4px; }
+  .pb-breathe { display:flex;flex-direction:column;align-items:center;margin:6px 0 4px; }
   .pb-breathe-ring {
-    width:66px;height:66px;border-radius:50%;
+    width:54px;height:54px;border-radius:50%;
     border:1.5px solid rgba(116,184,135,0.35);
     background:radial-gradient(circle, rgba(61,122,74,0.18) 0%, transparent 70%);
     box-shadow:0 0 0 0 rgba(61,122,74,0.4);
@@ -684,8 +684,11 @@ const CAT_CSS = `
 
   /* ── Break card ── */
   #pb-card {
-    position:fixed;bottom:-540px;right:22px;z-index:2147483645;
+    position:fixed;bottom:-900px;right:22px;z-index:2147483645;
     width:320px;
+    max-height:calc(100vh - 44px);
+    overflow-y:auto;
+    overflow-x:hidden;
     background:rgba(4,10,5,0.86);
     backdrop-filter:blur(32px) saturate(170%);
     -webkit-backdrop-filter:blur(32px) saturate(170%);
@@ -701,6 +704,9 @@ const CAT_CSS = `
     pointer-events:all;
     -webkit-font-smoothing:antialiased;
   }
+  #pb-card::-webkit-scrollbar { width:4px; }
+  #pb-card::-webkit-scrollbar-track { background:transparent; }
+  #pb-card::-webkit-scrollbar-thumb { background:rgba(116,184,135,0.25);border-radius:99px; }
   #pb-card.pb-show { bottom:22px; }
   #pb-card .pbt {
     font-size:20px;font-weight:700;color:#eaf5ec;
@@ -1375,7 +1381,7 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
     <div class="pb-stretch">
       <div class="pb-stretch-lbl">🪑 ${stretchTitle}</div>
       <div class="pb-stretch-row">
-        ${stretches.map(s => `<div class="pb-stretch-fig"><svg width="72" height="86" viewBox="0 0 72 86" fill="none">${s.svg}</svg><div class="pb-stretch-name">${s.name}</div></div>`).join("")}
+        ${stretches.map(s => `<div class="pb-stretch-fig"><svg width="60" height="72" viewBox="0 0 72 86" fill="none">${s.svg}</svg><div class="pb-stretch-name">${s.name}</div></div>`).join("")}
       </div>
     </div>
 
@@ -1588,7 +1594,7 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
     if (breatheTimer) clearTimeout(breatheTimer);
     try { chrome.runtime.sendMessage({ action: "breakResult", completed }); } catch (e) {}
 
-    if (card)     { card.style.transition = "bottom .45s ease-in"; card.style.bottom = "-540px"; }
+    if (card)     { card.style.transition = "bottom .45s ease-in"; card.style.bottom = "-900px"; }
     if (backdrop) { backdrop.style.transition = "background .5s ease, backdrop-filter .5s ease"; backdrop.style.background = "rgba(0,0,0,0)"; backdrop.style.backdropFilter = "blur(0px)"; backdrop.style.pointerEvents = "none"; }
     setTimeout(() => {
       if (walker) { walker.style.transition = "right 0.9s cubic-bezier(0.4,0,1,1)"; walker.style.right = "-340px"; }
