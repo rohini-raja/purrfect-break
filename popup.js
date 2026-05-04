@@ -4,6 +4,39 @@ const CAT_PERSONALITIES = [
   { name: "Noodle",  emoji: "😴",   unlockAt: 30, personalityLabel: "Sleepy"    },
 ];
 
+const CAT_PUNS = [
+  "You've got to be kitten me right meow!",
+  "I'm not fur-ling well today… just paws-ing.",
+  "That was a cat-astrophic pun. Sorry, not sorry.",
+  "I'm feline good about this break, Ro!",
+  "You're purrfectly capable. Don't fur-get it.",
+  "This break is non-negotiable. I'm not lion.",
+  "Stay paw-sitive, Ro! You got this.",
+  "What's a cat's favorite color? Purr-ple! Wait… sage green now.",
+  "I'm on a strict diet: fish, naps, and judging hooman.",
+  "Why did the cat sit on the computer? To keep an eye on the mouse!",
+  "Meow is the time to take a break!",
+  "I whisker you a very relaxing break.",
+  "You're looking a little ruff— wait, wrong animal.",
+  "Have a mice day, Ro! Get it? No? I'll go.",
+  "My cat therapist said I should be more paws-itive.",
+  "I'm a pro-cat-stinator and I'm proud of it.",
+  "What do cats eat for breakfast? Mice Krispies!",
+  "That's a purr-etty good stretch you just did.",
+  "I tried being serious once. It was a cat-astrophe.",
+  "Water you doing?! Drink some H2-Meow!",
+  "Don't stress meowt. Everything is fine.",
+  "Are you kitten me?! You haven't taken a break yet?",
+  "Let's paw-nder life's big questions… after this nap.",
+  "The cat's out of the bag: you need to rest!",
+  "I'm the cat's meow and I say HYDRATE.",
+  "Why was the cat bad at poker? He always showed his paws.",
+  "I've got a feline you're working too hard, Ro.",
+  "Take this break fur real. No cat-ting corners.",
+  "You're one in a meow-lion, Ro!",
+  "Cats rule, stress drools. Take your break!",
+];
+
 const HAPPINESS_STATES = [
   { max: 20,  emoji: "😾", label: "Grumpy",   color: "linear-gradient(90deg,#e05555,#f97070)" },
   { max: 40,  emoji: "😿", label: "Sad",      color: "linear-gradient(90deg,#e07840,#fb9a60)" },
@@ -14,6 +47,8 @@ const HAPPINESS_STATES = [
 
 document.addEventListener("DOMContentLoaded", () => {
   loadStatus();
+  renderPun();
+  loadHydration();
 
   document.getElementById("test-btn").addEventListener("click", () => {
     chrome.runtime.sendMessage({ action: "testCat" }, () => {
@@ -30,6 +65,10 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.textContent = "✓ Reset!";
       setTimeout(() => { btn.textContent = "↺ Reset Timer"; }, 1500);
     });
+  });
+
+  document.getElementById("hydration-btn").addEventListener("click", () => {
+    addWaterGlass();
   });
 
 });
@@ -116,4 +155,80 @@ function renderActiveCat(totalCompleted) {
       <span class="cat-slot-tag">${tag}</span>
     </div>`;
   }).join("");
+}
+
+// ── Cat Pun of the Day ─────────────────────────────────────────────────────
+function renderPun() {
+  const el = document.getElementById("pun-text");
+  if (!el) return;
+  // One pun per day — based on day-of-year
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now - start) / 86400000);
+  const pun = CAT_PUNS[dayOfYear % CAT_PUNS.length];
+  el.textContent = pun;
+}
+
+// ── Hydration Tracker ──────────────────────────────────────────────────────
+const HYDRATION_GOAL = 8;
+
+function getTodayKey() {
+  const d = new Date();
+  return `hydration_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
+}
+
+function loadHydration() {
+  const key = getTodayKey();
+  chrome.storage.local.get([key], (data) => {
+    const count = data[key] || 0;
+    renderHydrationGlasses(count);
+  });
+}
+
+function addWaterGlass() {
+  const key = getTodayKey();
+  chrome.storage.local.get([key], (data) => {
+    let count = data[key] || 0;
+    if (count >= HYDRATION_GOAL) return; // already full
+    count++;
+    chrome.storage.local.set({ [key]: count }, () => {
+      renderHydrationGlasses(count);
+    });
+  });
+}
+
+function renderHydrationGlasses(count) {
+  const container = document.getElementById("hydration-glasses");
+  const sub = document.getElementById("hydration-sub");
+  const btn = document.getElementById("hydration-btn");
+  if (!container) return;
+
+  container.innerHTML = "";
+  for (let i = 0; i < HYDRATION_GOAL; i++) {
+    const glass = document.createElement("div");
+    glass.className = "hydration-glass" + (i < count ? " filled" : "");
+    glass.addEventListener("click", () => {
+      // Clicking a glass toggles fill up to that point
+      const newCount = i < count ? i : i + 1;
+      chrome.storage.local.set({ [getTodayKey()]: newCount }, () => {
+        renderHydrationGlasses(newCount);
+      });
+    });
+    container.appendChild(glass);
+  }
+
+  if (sub) {
+    if (count >= HYDRATION_GOAL) {
+      sub.textContent = "🎉 Goal reached! Great job, Ro!";
+      sub.style.color = "rgba(116,184,135,0.65)";
+    } else {
+      sub.textContent = `${count} / ${HYDRATION_GOAL} glasses`;
+      sub.style.color = "";
+    }
+  }
+  if (btn) {
+    btn.textContent = count >= HYDRATION_GOAL ? "✓ Done!" : "+ Sip";
+    btn.disabled = count >= HYDRATION_GOAL;
+    btn.style.opacity = count >= HYDRATION_GOAL ? "0.4" : "1";
+  }
 }

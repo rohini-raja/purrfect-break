@@ -808,6 +808,68 @@ const CAT_CSS = `
     text-transform:uppercase;letter-spacing:0.6px;margin-top:4px;
   }
 
+  /* ── Eye Exercise (20-20-20) ── */
+  #pb-card .pb-eye-exercise {
+    background:rgba(61,122,74,0.06);
+    border:1px solid rgba(61,122,74,0.18);
+    border-radius:12px;padding:10px 12px 8px;
+    margin-bottom:10px;text-align:center;
+  }
+  #pb-card .pb-eye-lbl {
+    font-size:8px;font-weight:700;color:rgba(168,212,176,0.38);
+    text-transform:uppercase;letter-spacing:1.4px;margin-bottom:6px;
+  }
+  #pb-card .pb-eye-row {
+    display:flex;justify-content:center;align-items:center;gap:16px;
+    margin-bottom:6px;
+  }
+  #pb-card .pb-eye-svg { flex-shrink:0; }
+  #pb-card .pb-eye-steps {
+    text-align:left;font-size:10px;font-weight:500;
+    color:rgba(200,235,205,0.7);line-height:1.7;
+  }
+  #pb-card .pb-eye-steps span { color:#74b887;font-weight:700; }
+  .pb-eye-pupil {
+    animation:pb-eye-move 4s ease-in-out infinite;
+  }
+  @keyframes pb-eye-move {
+    0%,100%{transform:translate(0,0)}
+    15%{transform:translate(5px,0)}
+    30%{transform:translate(5px,-3px)}
+    45%{transform:translate(-5px,-3px)}
+    60%{transform:translate(-5px,3px)}
+    75%{transform:translate(5px,3px)}
+    90%{transform:translate(0,0)}
+  }
+  #pb-card .pb-eye-timer-bar {
+    height:3px;border-radius:99px;
+    background:rgba(255,255,255,0.07);
+    overflow:hidden;margin-top:6px;
+  }
+  #pb-card .pb-eye-timer-fill {
+    height:100%;border-radius:99px;width:0%;
+    background:linear-gradient(90deg,#3d7a4a,#74b887);
+    transition:width 1s linear;
+  }
+  #pb-card .pb-eye-countdown {
+    font-size:9px;color:rgba(168,212,176,0.4);
+    font-weight:600;margin-top:4px;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* ── Hydration button on break card ── */
+  #pb-card .pb-water-btn {
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    width:100%;padding:8px;margin-bottom:10px;
+    background:rgba(61,122,74,0.1);
+    border:1px solid rgba(61,122,74,0.25);
+    border-radius:10px;cursor:pointer;
+    font-family:inherit;font-size:11px;font-weight:600;
+    color:#74b887;transition:all 0.2s;
+  }
+  #pb-card .pb-water-btn:hover { background:rgba(61,122,74,0.22);transform:translateY(-1px); }
+  #pb-card .pb-water-btn.pb-water-done { opacity:0.5;pointer-events:none; }
+
   /* ── Quick action pills ── */
   #pb-card .pb-pills {
     display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap;
@@ -1317,10 +1379,29 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
       </div>
     </div>
 
+    <div class="pb-eye-exercise">
+      <div class="pb-eye-lbl">👁️ 20-20-20 Eye Rest</div>
+      <div class="pb-eye-row">
+        <svg class="pb-eye-svg" width="48" height="32" viewBox="0 0 48 32">
+          <ellipse cx="24" cy="16" rx="22" ry="14" fill="none" stroke="rgba(116,184,135,0.4)" stroke-width="1.5"/>
+          <circle cx="24" cy="16" r="8" fill="rgba(61,122,74,0.25)" stroke="rgba(116,184,135,0.5)" stroke-width="1"/>
+          <circle class="pb-eye-pupil" cx="24" cy="16" r="4" fill="#74b887"/>
+        </svg>
+        <div class="pb-eye-steps">
+          <span>20</span> sec · Look <span>20</span> ft away<br>
+          Every <span>20</span> min · Blink slowly
+        </div>
+      </div>
+      <div class="pb-eye-timer-bar"><div class="pb-eye-timer-fill" id="pb-eye-fill"></div></div>
+      <div class="pb-eye-countdown" id="pb-eye-countdown">Follow the eye for 20 seconds 👁️</div>
+    </div>
+
+    <button class="pb-water-btn" id="pb-water-btn">💧 I drank water!</button>
+
     <div class="pb-pills">
-      <div class="pb-pill"><span class="pb-pill-ic">💧</span>Sip water</div>
-      <div class="pb-pill"><span class="pb-pill-ic">👁️</span>Rest eyes</div>
       <div class="pb-pill"><span class="pb-pill-ic">🧘</span>Sit tall</div>
+      <div class="pb-pill"><span class="pb-pill-ic">🫁</span>Deep breath</div>
+      <div class="pb-pill"><span class="pb-pill-ic">🙆</span>Stretch</div>
     </div>
 
     <div class="pb-btns">
@@ -1349,6 +1430,40 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
     breatheTimer = setTimeout(tickBreath, phase.ms);
   }
 
+  // ── Eye Exercise 20-20-20 timer ─────────────────────────────────────────────
+  function startEyeTimer() {
+    const fillEl = document.getElementById("pb-eye-fill");
+    const countEl = document.getElementById("pb-eye-countdown");
+    if (!fillEl || !countEl) return;
+    let eyeSec = 0;
+    const eyeTotal = 20;
+    const eyeInterval = setInterval(() => {
+      eyeSec++;
+      const pct = Math.min(100, (eyeSec / eyeTotal) * 100);
+      fillEl.style.width = pct + "%";
+      const left = eyeTotal - eyeSec;
+      if (left > 0) {
+        countEl.textContent = `Look away from screen… ${left}s remaining 👁️`;
+      } else {
+        countEl.textContent = "✓ Eyes rested! Great job, Ro! 🎉";
+        fillEl.style.background = "linear-gradient(90deg,#3d7a4a,#5ca86a)";
+        clearInterval(eyeInterval);
+      }
+    }, 1000);
+  }
+
+  // ── Water button on break card ─────────────────────────────────────────────
+  function setupWaterBtn() {
+    const btn = document.getElementById("pb-water-btn");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      btn.textContent = "✓ Hydrated! 💧";
+      btn.classList.add("pb-water-done");
+      // Send message to background to log water
+      try { chrome.runtime.sendMessage({ action: "logWater" }); } catch(e) {}
+    });
+  }
+
   // ── Gift settle helper ─────────────────────────────────────────────────────
   function settleGift(delayMs) {
     if (!bringGift) return;
@@ -1373,6 +1488,8 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
       backdrop.classList.add("pb-active");
       requestAnimationFrame(() => card.classList.add("pb-show"));
       setTimeout(tickBreath, 600);
+      setTimeout(startEyeTimer, 800);
+      setupWaterBtn();
     }, 1200);
     settleGift(600);
 
@@ -1430,6 +1547,8 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
           backdrop.classList.add("pb-active");
           requestAnimationFrame(() => card.classList.add("pb-show"));
           setTimeout(tickBreath, 600);
+          setTimeout(startEyeTimer, 800);
+          setupWaterBtn();
         }, 2800);
         settleGift(2100);
       } else {
@@ -1443,6 +1562,8 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
           backdrop.classList.add("pb-active");
           requestAnimationFrame(() => card.classList.add("pb-show"));
           setTimeout(tickBreath, 600);
+          setTimeout(startEyeTimer, 800);
+          setupWaterBtn();
         }, 3800);
         settleGift(2800);
       }
@@ -1507,6 +1628,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         chrome.storage.local.set({ streak, maxStreak, skippedInARow, happiness, totalCompleted });
       }
     );
+    sendResponse({ ok: true });
+    return true;
+  }
+
+  if (msg.action === "logWater") {
+    const d = new Date();
+    const key = `hydration_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
+    chrome.storage.local.get([key], (data) => {
+      const count = Math.min(8, (data[key] || 0) + 1);
+      chrome.storage.local.set({ [key]: count });
+    });
     sendResponse({ ok: true });
     return true;
   }

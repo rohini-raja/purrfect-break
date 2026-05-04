@@ -189,6 +189,83 @@
     }
     .btn-secondary:hover { background: rgba(255,255,255,0.08); color: #eaf5ec; border-color: rgba(255,255,255,0.14); }
 
+    /* ── Cat Pun of the Day ── */
+    .pun-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(61,122,74,0.08);
+      border: 1px solid rgba(61,122,74,0.18);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+    .pun-icon { font-size: 20px; flex-shrink: 0; }
+    .pun-text {
+      font-size: 12px;
+      color: rgba(168,212,176,0.72);
+      font-weight: 500;
+      font-style: italic;
+      line-height: 1.4;
+    }
+
+    /* ── Hydration Tracker ── */
+    .hydration-section { padding: 12px 14px 10px; }
+    .hydration-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hydration-glasses {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+    }
+    .hydration-glass {
+      width: 22px; height: 28px;
+      border-radius: 4px 4px 6px 6px;
+      border: 1.5px solid rgba(116,184,135,0.25);
+      background: rgba(255,255,255,0.02);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .hydration-glass.filled {
+      border-color: rgba(116,184,135,0.55);
+    }
+    .hydration-glass.filled::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(74,184,135,0.35) 0%, rgba(61,122,74,0.55) 100%);
+      border-radius: 0 0 4px 4px;
+      animation: fillUp 0.4s ease-out;
+    }
+    @keyframes fillUp { from { height: 0; } to { height: 100%; } }
+    .hydration-glass:hover { border-color: rgba(116,184,135,0.5); transform: translateY(-1px); }
+    .hydration-btn {
+      padding: 6px 12px;
+      background: rgba(61,122,74,0.2);
+      border: 1px solid rgba(61,122,74,0.35);
+      border-radius: 8px;
+      color: #74b887;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .hydration-btn:hover { background: rgba(61,122,74,0.35); transform: translateY(-1px); }
+    .hydration-sub {
+      font-size: 10px;
+      color: rgba(168,212,176,0.32);
+      font-weight: 500;
+      margin-top: 6px;
+      text-align: center;
+    }
+
     .footer {
       text-align: center; padding-top: 2px;
       font-size: 10px; color: rgba(168,212,176,0.18); font-weight: 500;
@@ -243,6 +320,22 @@
         <div class="stat-val">15</div>
         <div class="stat-lbl">⏱ Min</div>
       </div>
+    </div>
+
+    <!-- Cat Pun of the Day -->
+    <div class="pun-card" id="pun-card">
+      <div class="pun-icon">😹</div>
+      <div class="pun-text" id="pun-text">Loading pun…</div>
+    </div>
+
+    <!-- Hydration Tracker -->
+    <div class="section hydration-section">
+      <div class="section-label">💧 Hydration Today</div>
+      <div class="hydration-row">
+        <div class="hydration-glasses" id="hydration-glasses"></div>
+        <button class="hydration-btn" id="hydration-btn">+ Sip</button>
+      </div>
+      <div class="hydration-sub" id="hydration-sub">0 / 8 glasses</div>
     </div>
 
     <!-- Next break -->
