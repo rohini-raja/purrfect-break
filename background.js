@@ -763,6 +763,30 @@ const CAT_CSS = `
     line-height:1.5;
   }
 
+  /* ── Quote card ── */
+  #pb-card .pb-quote {
+    position:relative;
+    padding:11px 14px 10px 16px;
+    margin-bottom:10px;
+    border-left:2.5px solid rgba(116,184,135,0.4);
+    background:rgba(61,122,74,0.06);
+    border-radius:0 10px 10px 0;
+  }
+  #pb-card .pb-quote-text {
+    font-size:11.5px;font-weight:500;
+    font-style:italic;
+    color:rgba(234,245,236,0.78);
+    line-height:1.55;
+    letter-spacing:-0.1px;
+  }
+  #pb-card .pb-quote-src {
+    font-size:9px;font-weight:600;
+    color:rgba(116,184,135,0.55);
+    margin-top:5px;
+    text-transform:uppercase;
+    letter-spacing:0.8px;
+  }
+
   /* ── Stretch section ── */
   #pb-card .pb-stretch {
     background:rgba(255,255,255,0.025);
@@ -1186,6 +1210,64 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
   const stretchTitles = ["Neck & Spine","Shoulders & Chest","Wrists & Arms","Lower Body","Breathing & Core"];
   const stretchTitle  = stretchTitles[(breakCount - 1) % stretchTitles.length];
 
+  // ── Motivational quotes ──────────────────────────────────────────────────
+  const quotes = [
+    // Anime
+    { text: "If you don't like your destiny, don't accept it. Instead, have the courage to change it the way you want it to be.", src: "Naruto" },
+    { text: "The world isn't perfect. But it's there for us, doing the best it can. That's what makes it so damn beautiful.", src: "Fullmetal Alchemist" },
+    { text: "People's lives don't end when they die. It ends when they lose faith.", src: "Itachi Uchiha" },
+    { text: "Whatever you lose, you'll find it again. But what you throw away you'll never get back.", src: "One Piece" },
+    { text: "A lesson without pain is meaningless. That's because no one can gain without sacrificing something.", src: "Fullmetal Alchemist: Brotherhood" },
+    { text: "Believing in someone. That's what makes you strong.", src: "Fairy Tail" },
+    { text: "The night is darkest before the dawn. But I promise you, the dawn is coming.", src: "Harvey Dent" },
+    { text: "Even if I die, you keep living okay? Live to see the end of this world, and to see why it was born.", src: "One Piece" },
+    { text: "When do you think people die? When they are forgotten.", src: "Dr. Hiluluk, One Piece" },
+    { text: "The only ones who should kill are those prepared to be killed.", src: "Lelouch, Code Geass" },
+    { text: "Forgetting is like a wound. The wound may heal, but it has already left a scar.", src: "Monkey D. Luffy" },
+    { text: "If you can't do something, then don't. Focus on what you can do.", src: "Shiroe, Log Horizon" },
+    { text: "It's not about whether I can. I'm doing it because I want to.", src: "Saitama, One Punch Man" },
+    { text: "The moment you give up is the moment you let someone else win.", src: "Koro-sensei, Assassination Classroom" },
+    { text: "Power comes in response to a need, not a desire.", src: "Goku, Dragon Ball Z" },
+
+    // Movies
+    { text: "Life is not the amount of breaths you take, it's the moments that take your breath away.", src: "Hitch" },
+    { text: "Every passing minute is another chance to turn it all around.", src: "Vanilla Sky" },
+    { text: "Just keep swimming.", src: "Dory, Finding Nemo" },
+    { text: "After all, tomorrow is another day.", src: "Scarlett O'Hara, Gone with the Wind" },
+    { text: "Oh yes, the past can hurt. But the way I see it, you can either run from it or learn from it.", src: "Rafiki, The Lion King" },
+    { text: "To infinity and beyond!", src: "Buzz Lightyear, Toy Story" },
+    { text: "It is not our abilities that show what we truly are. It is our choices.", src: "Dumbledore, Harry Potter" },
+    { text: "Why do we fall, sir? So that we can learn to pick ourselves up.", src: "Alfred, Batman Begins" },
+    { text: "Our lives are defined by opportunities, even the ones we miss.", src: "Benjamin Button" },
+    { text: "No matter what anybody tells you, words and ideas can change the world.", src: "Dead Poets Society" },
+    { text: "Don't let anyone ever make you feel like you don't deserve what you want.", src: "10 Things I Hate About You" },
+    { text: "It's only after we've lost everything that we're free to do anything.", src: "Fight Club" },
+    { text: "Get busy living or get busy dying.", src: "Shawshank Redemption" },
+
+    // Books
+    { text: "It does not do to dwell on dreams and forget to live.", src: "J.K. Rowling, Harry Potter" },
+    { text: "Not all those who wander are lost.", src: "J.R.R. Tolkien" },
+    { text: "It is only with the heart that one can see rightly; what is essential is invisible to the eye.", src: "The Little Prince" },
+    { text: "So we beat on, boats against the current, borne back ceaselessly into the past.", src: "The Great Gatsby" },
+    { text: "Happiness can be found even in the darkest of times, if one only remembers to turn on the light.", src: "Dumbledore" },
+    { text: "The only way out of the labyrinth of suffering is to forgive.", src: "Looking for Alaska" },
+    { text: "We accept the love we think we deserve.", src: "The Perks of Being a Wallflower" },
+    { text: "You are your best thing.", src: "Toni Morrison, Beloved" },
+    { text: "There is some good in this world, and it's worth fighting for.", src: "Samwise Gamgee, LOTR" },
+    { text: "And in that moment, I swear we were infinite.", src: "The Perks of Being a Wallflower" },
+    { text: "There is no greater agony than bearing an untold story inside you.", src: "Maya Angelou" },
+    { text: "Stay gold, Ponyboy. Stay gold.", src: "The Outsiders" },
+    { text: "Tomorrow we will run faster, stretch out our arms farther.", src: "The Great Gatsby" },
+    { text: "Pain demands to be felt.", src: "The Fault in Our Stars" },
+    { text: "Who controls the past controls the future. Who controls the present controls the past.", src: "George Orwell, 1984" },
+    { text: "I am not afraid of storms, for I am learning how to sail my ship.", src: "Louisa May Alcott" },
+    { text: "It matters not what someone is born, but what they grow to be.", src: "Dumbledore" },
+    { text: "All we have to decide is what to do with the time that is given us.", src: "Gandalf, LOTR" },
+    { text: "The only limit to our realization of tomorrow is our doubts of today.", src: "Franklin D. Roosevelt" },
+    { text: "What we do in life echoes in eternity.", src: "Gladiator" },
+  ];
+  const quote = quotes[(breakCount * 7 + streak) % quotes.length];
+
   // ── Break card ────────────────────────────────────────────────────────────
   const card = document.createElement("div");
   card.id = "pb-card";
@@ -1216,6 +1298,11 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
         <div class="pb-mindful-tag">${tip.tag}</div>
         <div class="pb-mindful-text">${tip.text}</div>
       </div>
+    </div>
+
+    <div class="pb-quote">
+      <div class="pb-quote-text">"${quote.text}"</div>
+      <div class="pb-quote-src">— ${quote.src}</div>
     </div>
 
     <div class="pb-breathe">
