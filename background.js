@@ -368,9 +368,16 @@ function getSeasonalInfo() {
 // ── GIF fetch ────────────────────────────────────────────────────────────────
 // Single attempt with a 6-second hard timeout — no retries to keep it snappy.
 async function gifUrlForMood() {
-  const url = `https://cataas.com/cat/gif?_=${Date.now()}`;
-  const timeout = new Promise(resolve => setTimeout(() => resolve(null), 6000));
-  const result  = await Promise.race([fetchAsDataUrl(url), timeout]);
+  // Try multiple cat image sources — first one to respond wins
+  const sources = [
+    `https://cataas.com/cat/gif?_=${Date.now()}`,
+    `https://cataas.com/cat?_=${Date.now()}`,
+    `https://placekitten.com/${280 + Math.floor(Math.random()*20)}/${280 + Math.floor(Math.random()*20)}`,
+  ];
+  const timeout = new Promise(resolve => setTimeout(() => resolve(null), 4000));
+  const fetches = sources.map(url => fetchAsDataUrl(url));
+  const fastest = Promise.any(fetches).catch(() => null);
+  const result  = await Promise.race([fastest, timeout]);
   if (!result) console.warn("[CatBreak] GIF skipped (timeout/error) — using CSS cat");
   return result;
 }
@@ -684,17 +691,16 @@ const CAT_CSS = `
 
   /* ── Break card ── */
   #pb-card {
-    position:fixed;bottom:-900px;right:22px;z-index:2147483645;
+    position:fixed !important;bottom:-900px;right:22px;z-index:2147483645;
     width:320px;
-    max-height:calc(100vh - 44px);
-    overflow-y:auto;
-    overflow-x:hidden;
+    max-height:calc(100vh - 44px) !important;
+    display:flex !important;flex-direction:column !important;
     background:rgba(4,10,5,0.86);
     backdrop-filter:blur(32px) saturate(170%);
     -webkit-backdrop-filter:blur(32px) saturate(170%);
     border:1px solid rgba(255,255,255,0.1);
     border-radius:22px;
-    padding:22px;
+    padding:0 !important;
     box-shadow:
       0 0 0 1px rgba(61,122,74,0.12),
       0 28px 72px rgba(0,0,0,0.6),
@@ -703,10 +709,18 @@ const CAT_CSS = `
     transition:bottom .75s cubic-bezier(0.22,1,0.36,1);
     pointer-events:all;
     -webkit-font-smoothing:antialiased;
+    overflow:hidden !important;
   }
-  #pb-card::-webkit-scrollbar { width:4px; }
-  #pb-card::-webkit-scrollbar-track { background:transparent; }
-  #pb-card::-webkit-scrollbar-thumb { background:rgba(116,184,135,0.25);border-radius:99px; }
+  #pb-card .pb-card-scroll {
+    overflow-y:auto !important;overflow-x:hidden !important;
+    flex:1;min-height:0;
+    padding:22px;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(116,184,135,0.25) transparent;
+  }
+  #pb-card .pb-card-scroll::-webkit-scrollbar { width:4px; }
+  #pb-card .pb-card-scroll::-webkit-scrollbar-track { background:transparent; }
+  #pb-card .pb-card-scroll::-webkit-scrollbar-thumb { background:rgba(116,184,135,0.25);border-radius:99px; }
   #pb-card.pb-show { bottom:22px; }
   #pb-card .pbt {
     font-size:20px;font-weight:700;color:#eaf5ec;
@@ -1340,6 +1354,7 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
   const card = document.createElement("div");
   card.id = "pb-card";
   card.innerHTML = `
+    <div class="pb-card-scroll">
     <div class="pb-card-header">
       <div class="pb-card-header-left">
         <p class="pbt">Purrfect Break!</p>
@@ -1414,7 +1429,8 @@ function injectCatUI(breakCount, catGifUrl, mood, streak, happiness, options, cs
       <button class="pb-bskip" id="pb-skip">Skip</button>
       <button class="pb-bdone" id="pb-done">✓ I'm Refreshed!</button>
     </div>
-    <div class="pb-foot">Next visit in 15 minutes 🐱</div>`;
+    <div class="pb-foot">Next visit in 15 minutes 🐱</div>
+    </div>`;
   document.body.appendChild(card);
 
   // ── Breathing guide ───────────────────────────────────────────────────────
